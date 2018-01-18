@@ -444,6 +444,12 @@ node-fetch@^1.7.3:
     encoding "^0.1.11"
     is-stream "^1.0.1"
 
+node-nvidia-smi@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/node-nvidia-smi/-/node-nvidia-smi-1.0.0.tgz#6aa57574540b2bed91c9a80218516ffa686e5ac7"
+  dependencies:
+    xml2js "^0.4.17"
+
 noop-logger@^0.1.1:
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/noop-logger/-/noop-logger-0.1.1.tgz#94a2b1633c4f1317553007d8966fd0e841b6a4c2"
@@ -592,6 +598,10 @@ rootpath@0.1.2:
 safe-buffer@^5.0.1, safe-buffer@^5.1.1, safe-buffer@~5.1.0, safe-buffer@~5.1.1:
   version "5.1.1"
   resolved "https://registry.yarnpkg.com/safe-buffer/-/safe-buffer-5.1.1.tgz#893312af69b2123def71f57889001671eeb2c853"
+
+sax@>=0.6.0:
+  version "1.2.4"
+  resolved "https://registry.yarnpkg.com/sax/-/sax-1.2.4.tgz#2816234e2378bddc4e5354fab5caa895df7100d9"
 
 scmp@0.0.3:
   version "0.0.3"
@@ -777,9 +787,20 @@ ws@^3.3.3:
     safe-buffer "~5.1.0"
     ultron "~1.1.0"
 
+xml2js@^0.4.17:
+  version "0.4.19"
+  resolved "https://registry.yarnpkg.com/xml2js/-/xml2js-0.4.19.tgz#686c20f213209e94abf0d1bcf1efaa291c7827a7"
+  dependencies:
+    sax ">=0.6.0"
+    xmlbuilder "~9.0.1"
+
 xmlbuilder@9.0.1:
   version "9.0.1"
   resolved "https://registry.yarnpkg.com/xmlbuilder/-/xmlbuilder-9.0.1.tgz#91cd70897755363eba57c12ddeeab4a341a61f65"
+
+xmlbuilder@~9.0.1:
+  version "9.0.4"
+  resolved "https://registry.yarnpkg.com/xmlbuilder/-/xmlbuilder-9.0.4.tgz#519cb4ca686d005a8420d3496f3f0caeecca580f"
 
 xtend@4.0.1, xtend@^4.0.0, xtend@^4.0.1:
   version "4.0.1"
