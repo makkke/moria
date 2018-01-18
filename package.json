@@ -1,0 +1,17 @@
+{
+  "scripts": {
+    "server:start": "node ./server.js",
+    "client:start": "node ./client.js"
+  },
+  "dependencies": {
+    "node-fetch": "^1.7.3",
+    "querystring": "^0.2.0",
+    "twilio": "^3.11.0",
+    "url-join": "^2.0.5",
+    "ws": "^3.3.3"
+  },
+  "optionalDependencies": {
+    "bufferutil": "^3.0.3",
+    "utf-8-validate": "^4.0.0"
+  }
+}
