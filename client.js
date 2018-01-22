@@ -1,24 +1,31 @@
 const WebSocket = require('ws')
 const smi = require('node-nvidia-smi')
 
-smi((err, data) => {
-  // handle errors
-  if (err) {
-    console.warn(err);
-    process.exit(1);
-  }
+const UPDATE_INTERVAL = 5 * 1000 // 5sec
 
-  // display GPU information
-  console.log(JSON.stringify(data, null, ' '))
+const rig = {
+  name: process.env.RIG_NAME,
+  profitability: process.env.RIG_PROFITABILITY,
+}
+
+const ws = new WebSocket('ws://5696b6cc.ngrok.io')
+ws.on('open', () => {
+  console.info('connected to farm')
+  ws.send(JSON.stringify({ type: 'CONNECTION_SUCCESS', payload: { rig } }))
+
+  setInterval(() => {
+    // get system data
+    smi((err, data) => {
+      if (err) {
+        ws.send(JSON.stringify({ type: 'LOAD_SYSTEM_DATA_FAILURE', payload: { rig, err } }))
+        console.warn(err)
+      }
+
+      ws.send(JSON.stringify({ type: 'LOAD_SYSTEM_DATA_SUCCESS', payload: { rig, data: data.nvidia_smi_log }}))
+    })
+  }, UPDATE_INTERVAL)
 })
 
-// const ws = new WebSocket('ws://192.168.86.26:8080')
-//
-// ws.on('open', function open() {
-//   console.info('connected to farm: ws://192.168.86.26:8080')
-//   ws.send({ type: 'connected' })
-// })
-//
-// ws.on('message', incoming(data) => {
-//   console.log(data)
-// })
+ws.on('message', (data) => {
+  console.log(data)
+})
