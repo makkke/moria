@@ -25,6 +25,18 @@ let nicehashStats = {
 }
 const rigs = {}
 
+const mapDataToRig = (data) => ({
+  pci: data.pci.pci_bus,
+  name: data.product_name,
+  usage: data.utilization.gpu_util,
+  temperature: data.temperature.gpu_temp,
+  power: {
+    draw: data.power_readings.power_draw,
+    limit: data.power_readings.power_limit,
+  },
+  fan: data.fan_speed,
+})
+
 const wss = new WebSocket.Server({ port: 9090, clientTracking: true })
 wss.on('connection', (ws) => {
   ws.on('message', (message) => {
@@ -47,29 +59,9 @@ wss.on('connection', (ws) => {
       case 'LOAD_SYSTEM_DATA_SUCCESS':
         rigs[rig.name].updatedAt = moment(data.timestamp)
         if (Array.isArray(data.gpu)) {
-          rigs[rig.name].gpus = data.gpu.map(gpu => ({
-            pci: gpu.pci.pci_bus,
-            name: gpu.product_name,
-            usage: gpu.utilization.gpu_util,
-            temperature: gpu.temperature.gpu_temp,
-            power: {
-              draw: gpu.power_readings.power_draw,
-              limit: gpu.power_readings.power_limit,
-            },
-            fan: gpu.fan_speed,
-          }))
+          rigs[rig.name].gpus = data.gpu.map(mapDataToRig)
         } else {
-          rigs[rig.name].gpus = [{
-            pci: data.gpu.pci.pci_bus,
-            name: data.gpu.product_name,
-            usage: data.gpu.utilization.gpu_util,
-            temperature: data.gpu.temperature.gpu_temp,
-            power: {
-              draw: data.gpu.power_readings.power_draw,
-              limit: data.gpu.power_readings.power_limit,
-            },
-            fan: data.gpu.fan_speed,
-          }]
+          rigs[rig.name].gpus = [mapDataToRig(data.gpu)]
         }
         // console.log(JSON.stringify(data, null, '\t'))
         break
