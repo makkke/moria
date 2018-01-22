@@ -8,7 +8,7 @@ const rig = {
   profitability: process.env.RIG_PROFITABILITY,
 }
 
-const ws = new WebSocket('ws://5696b6cc.ngrok.io')
+const ws = new WebSocket('ws://77e3e5f8.ngrok.io')
 ws.on('open', () => {
   console.info('connected to farm')
   ws.send(JSON.stringify({ type: 'CONNECTION_SUCCESS', payload: { rig } }))
