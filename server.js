@@ -101,7 +101,7 @@ const fetchNicehashStats = async () => {
   return {
     profitability: parseFloat(totalProfitability.toFixed(10)),
     balance: parseFloat(balance.toFixed(10)),
-    paidAt: payments[0] ? moment(payments[0].time) : null,
+    paidAt: payments[0] ? moment(payments[0].time * 1000) : null,
   }
 }
 
@@ -120,7 +120,11 @@ const sendSms = message => (
 const printFarmStats = () => {
   const { balance, profitability, paidAt } = nicehashStats
   const progress = balance / MINIMUM_PROFITABILITY * 100
-  const minProgress = paidAt ? (moment().diff(paidAt) / (24 * 60 * 60 * 1000)) * 100 : 0
+  const minProgress = paidAt ? moment().diff(paidAt) / 86400000 * 100 : 0
+  console.log(paidAt.format())
+  console.log(moment().format())
+  console.log(moment().diff(paidAt))
+  console.log(moment().milliseconds() - paidAt.milliseconds())
 
   console.log('Mining Farm: Happy Bit\n')
   let t = new Table()
