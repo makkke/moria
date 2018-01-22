@@ -4,7 +4,7 @@ const smi = require('node-nvidia-smi')
 const UPDATE_INTERVAL = 5 * 1000 // 5sec
 
 const rig = {
-  name: process.env.RIG_NAME || process.argv[2],
+  name: process.env.RIG_NAME.trim(),
   profitability: process.env.RIG_PROFITABILITY,
 }
 
