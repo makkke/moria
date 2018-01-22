@@ -4,6 +4,7 @@
     "client:start": "node ./client.js"
   },
   "dependencies": {
+    "colors": "^1.1.2",
     "easy-table": "^1.1.1",
     "moment": "^2.20.1",
     "node-fetch": "^1.7.3",

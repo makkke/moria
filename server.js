@@ -1,3 +1,4 @@
+const colors = require('colors')
 const moment = require('moment')
 const WebSocket = require('ws')
 const twilio = require('twilio')(
@@ -105,10 +106,6 @@ const fetchNicehashStats = async () => {
   }
 }
 
-const calcMinimumProfitability = () => {
-  return Object.keys(rigs).reduce((acc, x) => acc + rigs[x].profitability, 0.0)
-}
-
 const sendSms = message => (
   twilio.messages.create({
     from: process.env.TWILIO_PHONE_NUMBER,
@@ -122,27 +119,29 @@ const printFarmStats = () => {
   const progress = balance / MINIMUM_PROFITABILITY * 100
   const minProgress = paidAt ? moment().diff(paidAt) / 86400000 * 100 : 0
 
-  console.log('Mining Farm: Happy Bit\n')
+  console.log('Mining Farm: Happy Bit\n'.bold.underline)
   let t = new Table()
   // total gpus
-  t.cell('Progress', `${parseInt(progress, 10)}% of ${parseInt(minProgress, 10)}%`)
+  t.cell('Progress', (progress < minProgress ? `${parseInt(progress, 10)}%`.red : `${parseInt(progress, 10)}%`.green) + ` of ${parseInt(minProgress, 10)}%`)
   t.cell('Balance', stringifyBTCInMilliBTC(balance))
-  t.cell('Profitability', stringifyProfitabilityInMilliBTC(profitability))
+  t.cell('Profitability', profitability < MINIMUM_PROFITABILITY ? stringifyProfitabilityInMilliBTC(profitability).red : stringifyProfitabilityInMilliBTC(profitability).green)
   t.cell('Min Profitability', stringifyProfitabilityInMilliBTC(MINIMUM_PROFITABILITY))
   t.newRow()
   console.log(t.toString())
+  console.log()
 }
 
 const printRigStats = () => {
   Object.keys(rigs).forEach(x => {
     const rig = rigs[x]
 
-    console.log(`Rig: ${rig.name}`, rig.updatedAt ? `(${rig.updatedAt.fromNow()})` : '')
+    console.log(`Rig: ${rig.name}`.bold, rig.updatedAt ? `(${rig.updatedAt.fromNow()})`.bold : '')
+    console.log()
 
     if (rig.gpus.length) {
       const t = new Table()
       rig.gpus.forEach(gpu => {
-        t.cell('PCI Port', gpu.pci)
+        t.cell('PCI', gpu.pci)
         t.cell('GPU', gpu.name)
         t.cell('Usage', gpu.usage)
         t.cell('Temperature', gpu.temperature)
