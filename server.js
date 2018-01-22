@@ -125,7 +125,7 @@ const printFarmStats = () => {
   console.log('Mining Farm: Happy Bit\n')
   let t = new Table()
   // total gpus
-  t.cell('Progress', `${progress.toFixed(2)}% of ${minProgress.toFixed(2)}%`)
+  t.cell('Progress', `${parseInt(progress, 10)}% of ${parseInt(minProgress, 10)}%`)
   t.cell('Balance', stringifyBTCInMilliBTC(balance))
   t.cell('Profitability', stringifyProfitabilityInMilliBTC(profitability))
   t.cell('Min Profitability', stringifyProfitabilityInMilliBTC(MINIMUM_PROFITABILITY))
