@@ -120,8 +120,7 @@ const sendSms = message => (
 const printFarmStats = () => {
   const { balance, profitability, paidAt } = nicehashStats
   const progress = balance / MINIMUM_PROFITABILITY * 100
-  const minProgress = paidAt.clone().add(1, 'day').diff(paidAt) / 24 * 60 * 60 * 1000 * 100
-  console.log(paidAt.clone().add(1, 'day').diff(paidAt))
+  const minProgress = paidAt ? (moment().diff(paidAt) / (24 * 60 * 60 * 1000)) * 100 : 0
 
   console.log('Mining Farm: Happy Bit\n')
   let t = new Table()
