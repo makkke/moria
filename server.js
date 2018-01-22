@@ -8,6 +8,7 @@ const Table = require('easy-table')
 const { nicehashApi } = require('./utils/api')
 
 const BTC_WALLET = process.env.BTC_WALLET
+const MINIMUM_PROFITABILITY = 0.0035 + 0.0035 + 0.0007 + 0.00015
 const ALERT_THRESHOLD = 5 * 60 * 1000 // 5min
 const UPDATE_INTERVAL = 1 * 3 * 1000 // 3sec
 const NICEHASH_FETCH_INTERVAL = 1 * 60 * 1000 // 1min
@@ -19,6 +20,7 @@ const stringifyBTCInMilliBTC = btc => `${(btc * 1000).toFixed(7)} mBTC`
 let nicehashStats = {
   profitability: 0.0,
   balance: 0.0,
+  paidAt: null,
 }
 const rigs = {}
 
@@ -86,7 +88,7 @@ const clearScreen = () => {
 }
 
 const fetchNicehashStats = async () => {
-  const { current } = await nicehashApi({
+  const { current, payments } = await nicehashApi({
 		method: 'stats.provider.ex',
 		addr: BTC_WALLET,
 	})
@@ -99,6 +101,7 @@ const fetchNicehashStats = async () => {
   return {
     profitability: parseFloat(totalProfitability.toFixed(10)),
     balance: parseFloat(balance.toFixed(10)),
+    paidAt: payments[0] ? moment(payments[0].time) : null,
   }
 }
 
@@ -115,15 +118,18 @@ const sendSms = message => (
 )
 
 const printFarmStats = () => {
-  const { balance, profitability } = nicehashStats
-  const minimumProfitability = calcMinimumProfitability()
+  const { balance, profitability, paidAt } = nicehashStats
+  const progress = balance / MINIMUM_PROFITABILITY * 100
+  const minProgress = paidAt.clone().add(1, 'day').diff(paidAt) / 24 * 60 * 60 * 1000 * 100
+  console.log(paidAt.clone().add(1, 'day').diff(paidAt))
 
   console.log('Mining Farm: Happy Bit\n')
   let t = new Table()
   // total gpus
+  t.cell('Progress', `${progress.toFixed(2)}% of ${minProgress.toFixed(2)}%`)
   t.cell('Balance', stringifyBTCInMilliBTC(balance))
   t.cell('Profitability', stringifyProfitabilityInMilliBTC(profitability))
-  t.cell('Min Profitability', stringifyProfitabilityInMilliBTC(minimumProfitability))
+  t.cell('Min Profitability', stringifyProfitabilityInMilliBTC(MINIMUM_PROFITABILITY))
   t.newRow()
   console.log(t.toString())
 }
@@ -143,7 +149,7 @@ const printRigStats = () => {
         t.cell('Temperature', gpu.temperature)
         t.cell('Power Draw', gpu.power.draw)
         t.cell('Power Limit', gpu.power.limit)
-        t.cell('Fan', gpu.power.fan)
+        t.cell('Fan', gpu.fan)
         t.newRow()
       })
       console.log(t.toString())
