@@ -7,6 +7,7 @@ const twilio = require('twilio')(
 )
 const Table = require('easy-table')
 const { nicehashApi } = require('./utils/api')
+const { formatCurrentProgress, percentage } = require('./utils/utils')
 
 const BTC_WALLET = process.env.BTC_WALLET
 const MINIMUM_PROFITABILITY = 0.0035 + 0.0035 + 0.0007 + 0.00015
@@ -108,13 +109,12 @@ const sendSms = message => (
 
 const printFarmStats = () => {
   const { balance, profitability, paidAt } = nicehashStats
-  const progress = balance / MINIMUM_PROFITABILITY * 100
-  const minProgress = paidAt ? moment().diff(paidAt) / 86400000 * 100 : 0
+  const currentProgress = balance / MINIMUM_PROFITABILITY * 100
+  const minimumProgress = paidAt ? moment().diff(paidAt) / 86400000 * 100 : 0
 
   console.log('Mining Farm: Happy Bit\n'.bold.underline)
   let t = new Table()
-  // total gpus
-  t.cell('Progress', (progress < minProgress ? `${parseInt(progress, 10)}%`.red : `${parseInt(progress, 10)}%`.green) + ` of ${parseInt(minProgress, 10)}%`)
+  t.cell('Progress', `${formatCurrentProgress(currentProgress, minimumProgress)} of ${percentage(minimumProgress)}`)
   t.cell('Balance', stringifyBTCInMilliBTC(balance))
   t.cell('Profitability', profitability < MINIMUM_PROFITABILITY ? stringifyProfitabilityInMilliBTC(profitability).red : stringifyProfitabilityInMilliBTC(profitability).green)
   t.cell('Min Profitability', stringifyProfitabilityInMilliBTC(MINIMUM_PROFITABILITY))
