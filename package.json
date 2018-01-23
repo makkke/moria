@@ -4,12 +4,14 @@
     "client:start": "node ./client.js"
   },
   "dependencies": {
+    "cheerio": "^1.0.0-rc.2",
     "colors": "^1.1.2",
     "easy-table": "^1.1.1",
     "moment": "^2.20.1",
     "node-fetch": "^1.7.3",
     "node-nvidia-smi": "^1.0.0",
     "querystring": "^0.2.0",
+    "request-promise": "^4.2.2",
     "twilio": "^3.11.0",
     "url-join": "^2.0.5",
     "ws": "^3.3.3"

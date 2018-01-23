@@ -1,18 +1,15 @@
 const colors = require('colors')
 const moment = require('moment')
 const WebSocket = require('ws')
-const twilio = require('twilio')(
-  process.env.TWILIO_ACCOUNT_SID,
-  process.env.TWILIO_AUTH_TOKEN,
-)
 const Table = require('easy-table')
+
 const { nicehashApi } = require('./utils/api')
-const { formatCurrentProgress, percentage } = require('./utils/utils')
+const { formatCurrentProgress, percentage, mapDataToRig, clearScreen } = require('./utils/utils')
 
 const BTC_WALLET = process.env.BTC_WALLET
 const MINIMUM_PROFITABILITY = 0.0035 + 0.0035 + 0.0007 + 0.00015
 const ALERT_THRESHOLD = 5 * 60 * 1000 // 5min
-const UPDATE_INTERVAL = 1 * 3 * 1000 // 3sec
+const UPDATE_INTERVAL = 1 * 5 * 1000 // 5sec
 const NICEHASH_FETCH_INTERVAL = 1 * 60 * 1000 // 1min
 
 const stringifyProfitabilityInBTC = profitability => `${profitability.toFixed(10)} BTC/day`
@@ -26,18 +23,6 @@ let nicehashStats = {
 }
 const rigs = {}
 
-const mapDataToRig = (data) => ({
-  pci: data.pci.pci_bus,
-  name: data.product_name,
-  usage: data.utilization.gpu_util,
-  temperature: data.temperature.gpu_temp,
-  power: {
-    draw: data.power_readings.power_draw,
-    limit: data.power_readings.power_limit,
-  },
-  fan: data.fan_speed,
-})
-
 const wss = new WebSocket.Server({ port: 9090, clientTracking: true })
 wss.on('connection', (ws) => {
   ws.on('message', (message) => {
@@ -48,8 +33,8 @@ wss.on('connection', (ws) => {
         console.log(`Rig ${rig.name} connected`)
         rigs[rig.name] = {
           name: rig.name,
-          profitability: parseFloat(rig.profitability),
           gpus: [],
+          ...rigs[rig.name],
         }
         break
 
@@ -73,14 +58,6 @@ wss.on('connection', (ws) => {
   })
 })
 
-const clearScreen = () => {
-  const readline = require('readline')
-  const blank = '\n'.repeat(process.stdout.rows)
-  console.log(blank)
-  readline.cursorTo(process.stdout, 0, 0)
-  readline.clearScreenDown(process.stdout)
-}
-
 const fetchNicehashStats = async () => {
   const { current, payments } = await nicehashApi({
 		method: 'stats.provider.ex',
@@ -89,7 +66,6 @@ const fetchNicehashStats = async () => {
 
 	const activeAlgorithms = current.filter(x => x.data[0].a)
 	const totalProfitability = activeAlgorithms.reduce((acc, x) => acc + x.profitability * x.data[0].a, 0)
-
   const balance = current.reduce((acc, x) => acc + parseFloat(x.data[1]), 0.0)
 
   return {
@@ -98,14 +74,6 @@ const fetchNicehashStats = async () => {
     paidAt: payments[0] ? moment(payments[0].time * 1000) : null,
   }
 }
-
-const sendSms = message => (
-  twilio.messages.create({
-    from: process.env.TWILIO_PHONE_NUMBER,
-    to: process.env.PHONE_NUMBER,
-    body: message,
-  })
-)
 
 const printFarmStats = () => {
   const { balance, profitability, paidAt } = nicehashStats
@@ -139,6 +107,9 @@ const printRigStats = () => {
         t.cell('Temperature', parseInt(gpu.temperature, 10) > 75 ? gpu.temperature.red : parseInt(gpu.temperature, 10) > 60 ? gpu.temperature.yellow : gpu.temperature.green)
         t.cell('Power Draw', parseInt(gpu.power.draw, 10) > parseInt(gpu.power.limit, 10) ? gpu.power.draw.red : gpu.power.draw)
         t.cell('Power Limit', gpu.power.limit)
+        t.cell('Graphics Clock', `${gpu.clocks.graphics.current} of ${gpu.clocks.graphics.max}`)
+        t.cell('Memory Clock', `${gpu.clocks.memory.current} of ${gpu.clocks.memory.max}`)
+        t.cell('Video Clock', `${gpu.clocks.video.current} of ${gpu.clocks.video.max}`)
         t.cell('Fan', parseInt(gpu.fan, 10) > 75 ? gpu.fan.red : parseInt(gpu.fan, 10) > 50 ? gpu.fan.yellow : gpu.fan)
         t.newRow()
       })
