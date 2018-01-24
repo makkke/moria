@@ -7,8 +7,8 @@ const { nicehashApi } = require('./utils/api')
 const { formatCurrentProgress, percentage, mapDataToRig, clearScreen } = require('./utils/utils')
 
 const BTC_WALLET = process.env.BTC_WALLET
-const PROFITABILITY_PER_GPU = 0.00052
-const MINIMUM_PROFITABILITY = PROFITABILITY_PER_GPU * 6 + PROFITABILITY_PER_GPU * 6 + PROFITABILITY_PER_GPU * 3 + 0.00015
+const PROFITABILITY_PER_GPU = 0.00055
+const MINIMUM_PROFITABILITY = PROFITABILITY_PER_GPU * (6 + 6 + 3) + 0.00015
 const ALERT_THRESHOLD = 5 * 60 * 1000 // 5min
 const UPDATE_INTERVAL = 1 * 5 * 1000 // 5sec
 const NICEHASH_FETCH_INTERVAL = 1 * 60 * 1000 // 1min
@@ -110,7 +110,6 @@ const printRigStats = () => {
         t.cell('Power Limit', gpu.power.limit)
         t.cell('Graphics Clock', `${gpu.clocks.graphics.current} of ${gpu.clocks.graphics.max}`)
         t.cell('Memory Clock', `${gpu.clocks.memory.current} of ${gpu.clocks.memory.max}`)
-        t.cell('Video Clock', `${gpu.clocks.video.current} of ${gpu.clocks.video.max}`)
         t.cell('Fan', parseInt(gpu.fan, 10) > 75 ? gpu.fan.red : parseInt(gpu.fan, 10) > 50 ? gpu.fan.yellow : gpu.fan)
         t.newRow()
       })
