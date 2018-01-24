@@ -7,7 +7,8 @@ const { nicehashApi } = require('./utils/api')
 const { formatCurrentProgress, percentage, mapDataToRig, clearScreen } = require('./utils/utils')
 
 const BTC_WALLET = process.env.BTC_WALLET
-const MINIMUM_PROFITABILITY = 0.0035 + 0.0035 + 0.0007 + 0.00015
+const PROFITABILITY_PER_GPU = 0.00052
+const MINIMUM_PROFITABILITY = PROFITABILITY_PER_GPU * 6 + PROFITABILITY_PER_GPU * 6 + PROFITABILITY_PER_GPU * 3 + 0.00015
 const ALERT_THRESHOLD = 5 * 60 * 1000 // 5min
 const UPDATE_INTERVAL = 1 * 5 * 1000 // 5sec
 const NICEHASH_FETCH_INTERVAL = 1 * 60 * 1000 // 1min
@@ -84,7 +85,7 @@ const printFarmStats = () => {
   let t = new Table()
   t.cell('Progress', `${formatCurrentProgress(currentProgress, minimumProgress)} of ${percentage(minimumProgress)}`)
   t.cell('Balance', stringifyBTCInMilliBTC(balance))
-  t.cell('Profitability', profitability < MINIMUM_PROFITABILITY ? stringifyProfitabilityInMilliBTC(profitability).red : stringifyProfitabilityInMilliBTC(profitability).green)
+  t.cell('Profitability', profitability < MINIMUM_PROFITABILITY * 0.9 ? stringifyProfitabilityInMilliBTC(profitability).red : profitability < MINIMUM_PROFITABILITY ? stringifyProfitabilityInMilliBTC(profitability).yellow : stringifyProfitabilityInMilliBTC(profitability).green)
   t.cell('Min Profitability', stringifyProfitabilityInMilliBTC(MINIMUM_PROFITABILITY))
   t.newRow()
   console.log(t.toString())
@@ -105,7 +106,7 @@ const printRigStats = () => {
         t.cell('GPU', gpu.name)
         t.cell('Usage', parseInt(gpu.usage, 10) < 90 ? gpu.usage.red : parseInt(gpu.usage, 10) < 95 ? gpu.usage.yellow : gpu.usage.green)
         t.cell('Temperature', parseInt(gpu.temperature, 10) > 75 ? gpu.temperature.red : parseInt(gpu.temperature, 10) > 60 ? gpu.temperature.yellow : gpu.temperature.green)
-        t.cell('Power Draw', parseInt(gpu.power.draw, 10) > parseInt(gpu.power.limit, 10) ? gpu.power.draw.red : gpu.power.draw)
+        t.cell('Power Draw', parseInt(gpu.power.draw, 10) > parseInt(gpu.power.limit, 10) * 1.1 ? gpu.power.draw.red : parseInt(gpu.power.draw, 10) > parseInt(gpu.power.limit, 10) ? gpu.power.draw.yellow : gpu.power.draw)
         t.cell('Power Limit', gpu.power.limit)
         t.cell('Graphics Clock', `${gpu.clocks.graphics.current} of ${gpu.clocks.graphics.max}`)
         t.cell('Memory Clock', `${gpu.clocks.memory.current} of ${gpu.clocks.memory.max}`)

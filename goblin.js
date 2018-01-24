@@ -11,7 +11,7 @@ const DATA_FETCH_INTERVAL = 1 * 10 * 1000 // 1min
 
 const gpusToSearch = [
   '1080 ti',
-  '1080',
+  // '1080',
   // '1070 ti',
   // '1070',
   // '1060',
@@ -21,6 +21,9 @@ const gpusToSearch = [
 let availableGPUs = []
 
 const r = request.defaults({
+  headers: {
+    'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 9_1 like Mac OS X) AppleWebKit/601.1.46 (KHTML, like Gecko) Version/9.0 Mobile/13B143 Safari/601.1',
+  },
   transform: body => cheerio.load(body)
 })
 
@@ -38,9 +41,9 @@ const fetchAvailableGPU = async (name) => {
   console.log(url)
   try {
     const $ = await r(url)
+    console.log($('body').html())
     let gpus = []
     $('.item-container').each(function(i, elem) {
-      console.log(i)
       const buttonText = $(this).find('.item-button-area button').text().trim()
       console.log(buttonText)
       if (buttonText === 'Add To Cart') {
