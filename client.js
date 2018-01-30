@@ -5,11 +5,10 @@ const UPDATE_INTERVAL = 5 * 1000 // 5sec
 
 const rig = {
   name: process.env.RIG_NAME.trim(),
-  profitability: process.env.RIG_PROFITABILITY,
 }
 
 console.log('connecting...')
-const ws = new WebSocket('ws://d558c7cc.ngrok.io')
+const ws = new WebSocket('ws://9aa2c488.ngrok.io')
 ws.on('open', () => {
   console.info('connected to farm')
   ws.send(JSON.stringify({ type: 'CONNECTION_SUCCESS', payload: { rig } }))
