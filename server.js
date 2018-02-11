@@ -7,8 +7,8 @@ const { nicehashApi } = require('./utils/api')
 const { formatCurrentProgress, percentage, mapDataToRig, clearScreen } = require('./utils/utils')
 
 const BTC_WALLET = process.env.BTC_WALLET
-const PROFITABILITY_PER_GPU = 0.00055
-const MINIMUM_PROFITABILITY = PROFITABILITY_PER_GPU * (6 + 6 + 3)
+const PROFITABILITY_PER_GPU = 0.00052 // 0.00052
+const MINIMUM_PROFITABILITY = PROFITABILITY_PER_GPU * (6)
 const ALERT_THRESHOLD = 5 * 60 * 1000 // 5min
 const UPDATE_INTERVAL = 1 * 5 * 1000 // 5sec
 const NICEHASH_FETCH_INTERVAL = 1 * 60 * 1000 // 1min
@@ -60,10 +60,15 @@ wss.on('connection', (ws) => {
 })
 
 const fetchNicehashStats = async () => {
-  const { current, payments } = await nicehashApi({
+  const { current } = await nicehashApi({
 		method: 'stats.provider.ex',
 		addr: BTC_WALLET,
 	})
+  const { payments } = await nicehashApi({
+		method: 'stats.provider.payments',
+		addr: BTC_WALLET,
+	})
+
 
 	const activeAlgorithms = current.filter(x => x.data[0].a)
 	const totalProfitability = activeAlgorithms.reduce((acc, x) => acc + x.profitability * x.data[0].a, 0)
