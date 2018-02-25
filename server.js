@@ -8,7 +8,7 @@ const { formatCurrentProgress, percentage, mapDataToRig, clearScreen } = require
 
 const BTC_WALLET = process.env.BTC_WALLET
 const PROFITABILITY_PER_GPU = 0.00052 // 0.00052
-const MINIMUM_PROFITABILITY = PROFITABILITY_PER_GPU * (6)
+const MINIMUM_PROFITABILITY = PROFITABILITY_PER_GPU * (6 + 6)
 const ALERT_THRESHOLD = 5 * 60 * 1000 // 5min
 const UPDATE_INTERVAL = 1 * 5 * 1000 // 5sec
 const NICEHASH_FETCH_INTERVAL = 1 * 60 * 1000 // 1min
