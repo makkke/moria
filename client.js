@@ -8,7 +8,7 @@ const rig = {
 }
 
 console.log('connecting...')
-const ws = new WebSocket('ws://4769cb9e.ngrok.io')
+const ws = new WebSocket('ws://2ebba033.ngrok.io')
 ws.on('open', () => {
   console.info('connected to farm')
   ws.send(JSON.stringify({ type: 'CONNECTION_SUCCESS', payload: { rig } }))
